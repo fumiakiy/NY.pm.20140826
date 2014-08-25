@@ -2,6 +2,7 @@ use strict;
 use warnings;
 
 use Plack::Request;
+use HTTP::ServerEvent;
 
 my $app = sub {
     my $env = shift;
@@ -13,12 +14,14 @@ my $app = sub {
         my $writer = $responder->(
             [ 200,
               [
-                'Content-Type', 'text/plain',
-                'Content-Length', length($data)
+                'Content-Type', 'text/event-stream',
               ]
             ]
         );
-        $writer->write($data);
+        my $hse = HTTP::ServerEvent->as_string(
+            data => $data
+        );
+        $writer->write($hse);
     };
 };
 
