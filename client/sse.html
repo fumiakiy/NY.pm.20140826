@@ -1,0 +1,6 @@
+<script>
+var es = new EventSource('http://localhost:5000');
+es.onmessage = function(event) {
+    console.log(event.data);
+};
+</script>
