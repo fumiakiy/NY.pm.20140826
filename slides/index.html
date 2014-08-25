@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<!--
+  Google HTML5 slide template
+
+  Authors: Luke Mahé (code)
+           Marcin Wichary (code and design)
+           
+           Dominic Mazzoni (browser compatibility)
+           Charles Chen (ChromeVox support)
+
+  URL: http://code.google.com/p/html5slides/
+-->
+
+<html>
+  <head>
+    <title>HTML5 Server-Sent Events</title>
+
+    <meta charset='utf-8'>
+    <script src='slides.js'></script>
+  </head>
+  
+  <style>
+    /* Your individual styles here, or just use inline styles if that’s
+       what you want. */
+    
+    
+  </style>
+
+  <body style='display: none'>
+
+    <section class='slides layout-regular template-default'>
+
+      <article>
+        <h1>
+          HTML5 Server-Sent Events and Perl
+        </h1>
+        <p>
+          Fumiaki Yoshimatsu
+        </p>
+      </article>
+      
+      <article>
+        <h3>
+            About Me
+        </h3>
+        <p>
+          Senior software engineer at Peatix Inc (http://peatix.com).
+        </p>
+        <p>
+            Perl, JavaScript, Objective-C and Java.
+        </p>
+        <p>
+            nginx, Catalyst-backed web application, memcached, Kyoto-Tycoon, MySQL, mongodb...
+        </p>
+      </article>
+
+      <article>
+        <h3>
+            Server-Sent Events
+        </h3>
+        <q>
+            ...enable servers to push data to Web pages over HTTP or using dedicated server-push protocols...
+        </q>
+        <div class="author">http://www.w3.org/TR/eventsource/</div>
+      </article>
+
+      <article>
+        <h3>
+            WebSockets?
+        </h3>
+        <p>
+            No, you don't need no websockets for server side push.
+        </p>
+        <ul>
+            <li>//blog.fanout.io/2014/06/24/you-might-not-need-a-websocket/</li>
+            <li>//speakerdeck.com/3rdeden/websuckets</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+          Simple event handling (JavaScript) 
+        </h3>
+        <section>
+        <pre>
+source = new EventSource('http://example.com/sse');
+source.onmessage = function (event) {
+  console.log(event.data);
+};</pre>
+      </article>
+
+      <article>
+        <h3>
+          Simple server (Perl)
+        </h3>
+        <section>
+        <pre>
+my $req = Plack::Request->new($env);
+return sub {
+  my $responder = shift;
+  my $cv = AnyEvent->condvar;
+  my $writer = $responder->(
+    [ 200,
+      [
+        'Content-Type', 'text/event-stream',
+      ]
+    ]
+  );
+  my $hse = HTTP::ServerEvent->as_string(
+      data => 'Hello SSE!'
+  );
+  $writer->write($hse);
+};
+</pre>
+      </article>
+
+      <article class='fill'>
+        <h3>
+          Cross Platform Support...?
+        </h3>
+        <p>
+          <img src='caniusesse.png' width="778">
+        </p>
+        <div class='source white'>
+          Source: http://caniuse.com/#feat=eventsource
+        </div>
+      </article>
+
+      <article class='fill'>
+        <h3>
+            EventSource polyfill
+        </h3>
+        <p>
+            https://github.com/Yaffle/EventSource
+        </p>
+      </article>
+
+      <article>
+        <h3>
+            Let's write some code
+        </h3>
+      </article>
+
+      <article>
+        <h3>
+            Points made (1/2)
+        </h3>
+        <ul>
+            <li>Server-Sent Events is a very simple yet powerful way of implementing "server push".</li>
+            <li>It's so simple HTTP based interface that you can write your own clients pretty easily.</li>
+            <li>Built-in supports in most "modern" web brosers.</li>
+        </ul>
+      </article>
+
+      <article>
+        <h3>
+            Points made (2/2)
+        </h3>
+        <ul>
+            <li>JavaScript code you have to write is also pretty simple and work with most of the JS frameworks.</li>
+            <li>SSE clients are most likely going to reconnect to you automatically.</li>
+            <li>Your server code should not block.</li>
+        </ul>
+      </article>
+      
+      <article>
+        <h3>
+          Thank you!
+        </h3>
+        <p>
+          <ul>
+            <li><a href="http://twitter.com/fumiakiy">@fumiakiy</a></li>
+            <li><a href="https://github.com/fumiakiy">https://github.com/fumiakiy</a></li>
+          </ul>
+        </p>
+      </article>
+
+    </section>
+
+  </body>
+</html>
