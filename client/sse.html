@@ -1,6 +1,10 @@
 <script>
 var es = new EventSource('http://localhost:5000');
-es.onmessage = function(event) {
-    console.log(event.data);
-};
+es.addEventListener('data', function(event) {
+    console.log(event);
+});
+es.addEventListener('closed', function(event) {
+    console.log(event);
+    es.close();
+});
 </script>

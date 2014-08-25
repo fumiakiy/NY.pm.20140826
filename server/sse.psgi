@@ -30,10 +30,16 @@ my $app = sub {
                 $data or return;
                 chomp $data;
                 my $hse = HTTP::ServerEvent->as_string(
-                    data => $data
+                    event => 'data'
+                    , data => $data
                 );
                 $writer->write($hse);
                 if ( $data eq 'bye' ) {
+                    $hse = HTTP::ServerEvent->as_string(
+                        event => 'closed'
+                        , data => $data
+                    );
+                    $writer->write($hse);
                     close $fh;
                     undef $w;
                 }
