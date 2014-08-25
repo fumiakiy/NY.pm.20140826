@@ -17,6 +17,7 @@ my $app = sub {
             [ 200,
               [
                 'Content-Type', 'text/event-stream',
+                'Access-Control-Allow-Origin', '*',
               ]
             ]
         );
