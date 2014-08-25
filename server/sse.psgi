@@ -19,7 +19,8 @@ my $app = sub {
             ]
         );
         my $hse = HTTP::ServerEvent->as_string(
-            data => $data
+            event => 'dataArrived'
+            , data => $data
         );
         $writer->write($hse);
     };
