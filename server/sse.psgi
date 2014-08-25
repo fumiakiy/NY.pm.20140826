@@ -10,6 +10,7 @@ my $app = sub {
     my $req = Plack::Request->new( $env );
     my $w;
 
+    my @data = (0..100);
     return sub {
         my $responder = shift;
         my $data = 'Hello SSE!';
@@ -21,26 +22,29 @@ my $app = sub {
               ]
             ]
         );
-        open my $fh, '<', '/tmp/sse';
-        $w = AnyEvent->io(
-            fh => $fh
-            , poll => 'r'
+        my $i = 0;
+        my $last_event_id = $req->header('last-event-id');
+        $last_event_id and $i += $last_event_id + 1;
+        while ( $last_event_id + 1 ) {
+            shift @data;
+            $last_event_id--;
+        }
+        $w = AnyEvent->timer(
+            after => 0
+            , interval => 2
             , cb => sub {
-                my $data = <$fh>;
-                $data or return;
-                chomp $data;
                 my $hse = HTTP::ServerEvent->as_string(
-                    event => 'data'
-                    , data => $data
+                    id => $i++
+                    , event => 'data'
+                    , data => shift(@data)
                 );
                 $writer->write($hse);
-                if ( $data eq 'bye' ) {
+                unless ( @data ) {
                     $hse = HTTP::ServerEvent->as_string(
                         event => 'closed'
                         , data => $data
                     );
                     $writer->write($hse);
-                    close $fh;
                     undef $w;
                 }
             }
